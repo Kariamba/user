@@ -42,12 +42,12 @@ PHP Tested: 5.6.19, 7.0.11
 Class definition is provided in $_definition variable:
 
 	private static $_definition = array(
-		'table' => 'users',														/* users table name */
-		'id' => 'userID',															/* user identifier field name */
-		'login' => 'login',														/* user login field name*/
-		'pass' => 'password',													/* user password field name */
-		'key' => 'session_key',												/* user session key field name */
-		'fields' => array('group', 'name', 'mail')		/* add your fields here */
+	  'table' => 'users',                         /* users table name */
+	  'id' => 'userID',                           /* user identifier field name */
+	  'login' => 'login',                         /* user login field name*/
+	  'pass' => 'password',                       /* user password field name */
+	  'key' => 'session_key',                     /* user session key field name */
+	  'fields' => array('group', 'name', 'mail')  /* add your fields here */
 	);
 	
 * * *
