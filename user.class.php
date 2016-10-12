@@ -28,11 +28,11 @@
 		
 		/** @var array $_definition				Definition of DB users table */
 		private static $_definition = array(
-			'table' => 'users',														/* table */
-			'id' => 'userID',															/* field of user identifier */
-			'login' => 'login',														/* field of user login */
-			'pass' => 'password',													/* field of user password */
-			'key' => 'session_key',												/* field of user session key */
+			'table' => 'users',														/* users table name */
+			'id' => 'userID',															/* user identifier field name */
+			'login' => 'login',														/* user login field name*/
+			'pass' => 'password',													/* user password field name */
+			'key' => 'session_key',												/* user session key field name */
 			'fields' => array('group', 'name', 'mail')		/* add your fields here */
 		);
 		
