@@ -32,7 +32,7 @@
 			'id' => 'userID',															/* field of user identifier */
 			'login' => 'login',														/* field of user login */
 			'pass' => 'password',													/* field of user password */
-			'key' => 'session_key'												/* field of user session key */
+			'key' => 'session_key',												/* field of user session key */
 			'fields' => array('group', 'name', 'mail')		/* add your fields here */
 		);
 		
@@ -42,24 +42,25 @@
 		/**
 		* Initialization method. Connect to DB and set initialization flag.
 		*
-		* @param string $sql_drvr		DB connection driver.
-		* @param string $sql_host		DB server host.
-		* @param string $sql_name		DB name.
-		* @param string $sql_user		DB user.
-		* @param string $sql_pass		DB password.
+		* @param string $db_drvr		DB connection driver.
+		* @param string $db_host		DB server host.
+		* @param string $db_name		DB name.
+		* @param string $db_user		DB user.
+		* @param string $db_pass		DB password.
 		*
 		* @return bool Returns initialization flag value.
 		*/
-		static function init($sql_drvr, $sql_host, $sql_name, $sql_user, $sql_pass) {
+		static function init($db_drvr, $db_host, $db_name, $db_user, $db_pass) {
 			try {
-				switch($sql_drvr) {
-					case 'mysql': self::$_db = new \PDO('mysql:host=' . $host . ';dbname=' . $name, $user, $pass); break;
-					case 'mssql': self::$_db = new \PDO('mssql:host=' . $host . ';dbname=' . $name, $user, $pass); break;
-					case 'sybase': self::$_db = new \PDO('sybase:host=' . $host . ';dbname=' . $name, $user, $pass); break;
-					default: self::$_db = new \PDO('mysql:host=' . $host . ';dbname=' . $name, $user, $pass); break;
+				switch($db_drvr) {
+					case 'mysql': self::$_db = new \PDO('mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass); break;
+					case 'mssql': self::$_db = new \PDO('mssql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass); break;
+					case 'sybase': self::$_db = new \PDO('sybase:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass); break;
+					default: self::$_db = new \PDO('mysql:host=' . $db_host . ';dbname=' . $db_name, $db_user, $db_pass); break;
 				}
+				self::$_db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION); 
 			}  
-			catch(PDOException $e) {  
+			catch(\PDOException $e) {  
 				die($e->getMessage());
 			}
 			if(!empty(self::$_definition['table']) && !empty(self::$_definition['id']) && !empty(self::$_definition['login']) && !empty(self::$_definition['pass'])) {
@@ -79,7 +80,7 @@
 			$user = false;
 			if(self::$_init) {
 				$res = self::$_db->prepare('SELECT * FROM `' . self::$_definition['table'] . '` WHERE `' . self::$_definition['id'] . '` = :id;');
-				$res->setFetchMode(PDO::FETCH_ASSOC);
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
 				$res->execute(array('id' => $userID));
 				if($lot = $res->fetch()) {
 					/* main fields, except password */
@@ -91,7 +92,7 @@
 					/* other fields */
 					if(!empty(self::$_definition['fields'])) {
 						foreach(self::$_definition['fields'] as $field) {
-							$user[$field] = !empty($lot[$filed]) ? $lot[$filed] : '';
+							$user[$field] = !empty($lot[$field]) ? $lot[$field] : '';
 						}
 					}
 				}
@@ -110,7 +111,7 @@
 			$user = false;
 			if(self::$_init) {
 				$res = self::$_db->prepare('SELECT * FROM `' . self::$_definition['table'] . '` WHERE `' . self::$_definition['login'] . '` = :login;');
-				$res->setFetchMode(PDO::FETCH_ASSOC);
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
 				$res->execute(array('login' => $login));
 				if($lot = $res->fetch()) {
 					/* main fields, except password */
@@ -122,7 +123,7 @@
 					/* other fields */
 					if(!empty(self::$_definition['fields'])) {
 						foreach(self::$_definition['fields'] as $field) {
-							$user[$field] = !empty($lot[$filed]) ? $lot[$filed] : '';
+							$user[$field] = !empty($lot[$field]) ? $lot[$field] : '';
 						}
 					}
 				}
@@ -139,7 +140,7 @@
 			$list = array();
 			if(self::$_init) {
 				$res = self::$_db->query('SELECT * FROM `' . self::$_definition['table'] . '` ORDER BY `' . self::$_definition['id'] . '`;');
-				$res->setFetchMode(PDO::FETCH_ASSOC);
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
 				while($lot = $res->fetch()) {
 					/* main fields, except password */
 					$user = array(
@@ -149,7 +150,7 @@
 					/* other fields */
 					if(!empty(self::$_definition['fields'])) {
 						foreach(self::$_definition['fields'] as $field) {
-							$user[$field] = !empty($lot[$filed]) ? $lot[$filed] : '';
+							$user[$field] = !empty($lot[$field]) ? $lot[$field] : '';
 						}
 					}
 					$list[] = $user;
@@ -180,14 +181,14 @@
 
 				if(!empty(self::$_definition['fields'])) {
 					foreach(self::$_definition['fields'] as $field) {
-						$user_data[$field] = !empty($data[$filed]) ? $data[$filed] : '';
+						$user_data[$field] = !empty($data[$field]) ? $data[$field] : null;
 						$sql_set[] = '`' . $field . '` = :' . $field;
 					}
 				}
 				if(!empty($user_data['login']) && !empty($user_data['pass'])) {
 					if(!self::loginExists($user_data['login'])) {
 						$res = self::$_db->prepare('INSERT INTO `' . self::$_definition['table'] . '` SET ' . implode(', ', $sql_set) . ';');
-						$res->setFetchMode(PDO::FETCH_ASSOC);
+						$res->setFetchMode(\PDO::FETCH_ASSOC);
 						if($res->execute($user_data)) {
 							$result = self::$_db->lastInsertId();
 						}
@@ -223,12 +224,12 @@
 				if(!empty($data)) {
 					foreach($data as $key => $val) {
 						if(in_array($key, self::$_definition['fields'])) {
-							$user_data[$key] = !empty($val) ? $val : '';
-							$sql_set[] = '`' . $key . '` = :' . $val;
+							$user_data[$key] = !empty($val) ? $val : null;
+							$sql_set[] = '`' . $key . '` = :' . $key;
 						}
 					}
 					$res = self::$_db->prepare('UPDATE `' . self::$_definition['table'] . '` SET ' . implode(', ', $sql_set) . ' WHERE `' . self::$_definition['id'] . '` = :id;');
-					$res->setFetchMode(PDO::FETCH_ASSOC);
+					$res->setFetchMode(\PDO::FETCH_ASSOC);
 					if($res->execute($user_data)) {
 						$result = true;
 					}
@@ -255,7 +256,7 @@
 				if(!empty($userID) && !empty($login)) {
 					if(!self::loginExists($login, $userID)) {
 						$res = self::$_db->prepare('UPDATE `' . self::$_definition['table'] . '` SET `' . self::$_definition['login'] . '` = :login WHERE `' . self::$_definition['id'] . '` = :id;');
-						$res->setFetchMode(PDO::FETCH_ASSOC);
+						$res->setFetchMode(\PDO::FETCH_ASSOC);
 						if($res->execute(array('id' => $userID, 'login' => $login))) {
 							$result = true;
 						}
@@ -286,7 +287,7 @@
 			$result = false;
 			if(self::$_init) {
 				$res = self::$_db->prepare('SELECT `' . self::$_definition['id'] . '` FROM `' . self::$_definition['table'] . '` WHERE `' . self::$_definition['login'] . '` = :login AND `' . self::$_definition['id'] . '` <> :id;');
-				$res->setFetchMode(PDO::FETCH_ASSOC);
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
 				$res->execute(array('id' => $userID, 'login' => $login));
 				if($res->rowCount() > 0) {
 					$result = true;
@@ -339,7 +340,7 @@
 			if(self::$_init) {
 				if(!empty($userID) && !empty($pass)) {
 					$res = self::$_db->prepare('UPDATE `' . self::$_definition['table'] . '` SET `' . self::$_definition['pass'] . '` = :pass WHERE `' . self::$_definition['id'] . '` = :id;');
-					$res->setFetchMode(PDO::FETCH_ASSOC);
+					$res->setFetchMode(\PDO::FETCH_ASSOC);
 					if($res->execute(array('id' => $userID, 'pass' => self::passwordCreate($pass)))) {
 						$result = true;
 					}
@@ -349,6 +350,26 @@
 				}
 				else {
 					self::$_error_list[] = 'User ID and Password are required fields';
+				}
+			}
+			return $result;
+		}
+		
+		/**
+		* Get user password hash.
+		*
+		* @param int $userID			User ID.
+		*
+		* @return string|false Returns user password hash or false.
+		*/
+		static function passwordGet($userID) {
+			$result = false;
+			if(self::$_init) {
+				$res = self::$_db->prepare('SELECT `' . self::$_definition['id'] . '`, `' . self::$_definition['pass'] . '` FROM `' . self::$_definition['table'] . '` WHERE `' . self::$_definition['id'] . '` = :id;');
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
+				$res->execute(array('id' => $userID));
+				if($lot = $res->fetch()) {
+					$result = $lot[self::$_definition['pass']];
 				}
 			}
 			return $result;
@@ -366,18 +387,18 @@
 			$result = false;
 			if(self::$_init) {
 				$res = self::$_db->prepare('SELECT `' . self::$_definition['id'] . '`, `' . self::$_definition['pass'] . '` FROM `' . self::$_definition['table'] . '` WHERE `' . self::$_definition['login'] . '` = :login;');
-				$res->setFetchMode(PDO::FETCH_ASSOC);
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
 				$res->execute(array('login' => $login));
 				if($lot = $res->fetch()) {
-					if(self::checkPassword($pass, $lot[self::$_definition['pass']])) {
+					if(self::passwordCheck($pass, $lot[self::$_definition['pass']])) {
 						$result = true;
 						$key = md5(microtime(true));
 						$_SESSION['user']['id'] = $lot[self::$_definition['id']];
 						$_SESSION['user']['key'] = $key;
 						$_SESSION['user']['time'] = time() + self::KEY_LIFETIME;
 						$res = self::$_db->prepare('UPDATE `' . self::$_definition['table'] . '` SET `' . self::$_definition['key'] . '` = :key WHERE `' . self::$_definition['id'] . '` = :id;');
-						$res->setFetchMode(PDO::FETCH_ASSOC);
-						$res->execute(array('key' => $key));
+						$res->setFetchMode(\PDO::FETCH_ASSOC);
+						$res->execute(array('key' => $key, 'id' => $lot[self::$_definition['id']]));
 					}
 				}
 			}
@@ -425,7 +446,7 @@
 			if(self::$_init) {
 				$now = time();
 				if(!empty($_SESSION['user']['id']) && !empty($_SESSION['user']['key'])) {
-					if($now < $_COOKIE['user']['time']) {
+					if($now < $_SESSION['user']['time']) {
 						$now = time();
 						$user = self::getByID($_SESSION['user']['id']);
 						if($user['key'] == $_SESSION['user']['key']) {
