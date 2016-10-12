@@ -2,6 +2,10 @@
 
 Universal class for basic user routine. Class definition for your project purpose is required.
 
+Class provides:
+- user database routine (select / insert / update / delete)
+- user account routine (login / logout / recover / check)
+
 Probably the best way is to use the ideas of methods realization in your own class.
 
 PHP Tested: 5.6.19, 7.0.11
