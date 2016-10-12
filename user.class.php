@@ -172,7 +172,7 @@
 			if(self::$_init) {
 				$user_data = array(
 					'login' => !empty($data['login']) ? $data['login'] : '',
-					'pass' => !empty($data['pass']) ? self::passwordCreate($data['pass']) : ''
+					'pass' => !empty($data['pass']) ? self::passwordHash($data['pass']) : ''
 				);
 				$sql_set = array(
 					'`' . self::$_definition['login'] . '` = :login',
@@ -242,6 +242,29 @@
 		}
 		
 		/**
+		* Delete user.
+		*
+		* @param int $userID			User ID.
+		*
+		* @return boolean Returns result of delete.
+		*/
+		static function delete($userID) {
+			$result = false;
+			self::$_error_list = array();
+			if(self::$_init) {
+				$res = self::$_db->prepare('DELETE FROM `' . self::$_definition['table'] . '` WHERE `' . self::$_definition['id'] . '` = :id;');
+				$res->setFetchMode(\PDO::FETCH_ASSOC);
+				if($res->execute(array('id' => $userID))) {
+					$result = true;
+				}
+				else {
+					self::$_error_list[] = 'DB error';
+				}
+			}
+			return $result;
+		}
+		
+		/**
 		* Update user login.
 		*
 		* @param int $userID			User ID.
@@ -303,7 +326,7 @@
 		*
 		* @return string Returns hash of user password.
 		*/
-		static function passwordCreate($pass) {
+		static function passwordHash($pass) {
 			$salt = md5(microtime(true));
 			$hash = $salt . md5($pass . $salt);
 			return $hash;
@@ -341,7 +364,7 @@
 				if(!empty($userID) && !empty($pass)) {
 					$res = self::$_db->prepare('UPDATE `' . self::$_definition['table'] . '` SET `' . self::$_definition['pass'] . '` = :pass WHERE `' . self::$_definition['id'] . '` = :id;');
 					$res->setFetchMode(\PDO::FETCH_ASSOC);
-					if($res->execute(array('id' => $userID, 'pass' => self::passwordCreate($pass)))) {
+					if($res->execute(array('id' => $userID, 'pass' => self::passwordHash($pass)))) {
 						$result = true;
 					}
 					else {
