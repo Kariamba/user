@@ -7,7 +7,7 @@
 	*		- login / logout / check / recover
 	*
   * @author		Oleg Zorin <zorinoa@yandex.ru>
-	* @link			http://oleg.zorin.ru Oleg Zorin home page
+	* @link			http://oleg.zorin.ru homepage
 	*
 	* @license https://opensource.org/licenses/GPL-3.0 GNU Public License, version 3
 	*

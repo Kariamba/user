@@ -9,7 +9,7 @@
 	use OZ\User as User;
 	
 	/* Mysql access */
-	$sql_driver = 'mysqli';
+	$sql_driver = 'mysql';
 	$sql_host = 'localhost';
 	$sql_name = 'opensource.my';
 	$sql_user = 'root';
