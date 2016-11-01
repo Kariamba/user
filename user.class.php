@@ -414,6 +414,7 @@
 				$res->execute(array('login' => $login));
 				if($lot = $res->fetch()) {
 					if(self::passwordCheck($pass, $lot[self::$_definition['pass']])) {
+						session_regenerate_id();
 						$result = true;
 						$key = md5(microtime(true));
 						$_SESSION['user']['id'] = $lot[self::$_definition['id']];
@@ -435,6 +436,7 @@
 		*/
 		static function logout() {
 			$_SESSION['user'] = null;
+			session_regenerate_id();
 			return true;
 		}
 		
