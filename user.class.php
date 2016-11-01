@@ -64,7 +64,7 @@
 				die($e->getMessage());
 			}
 			
-			$session_check = false
+			$session_check = false;
 			if(version_compare(phpversion(), '5.4.0', '>=')) {
 				if(session_status() === PHP_SESSION_ACTIVE) {
 					$session_check = true;
@@ -430,7 +430,6 @@
 				$res->execute(array('login' => $login));
 				if($lot = $res->fetch()) {
 					if(self::passwordCheck($pass, $lot[self::$_definition['pass']])) {
-						echo 1;
 						session_regenerate_id();
 						$result = true;
 						$key = md5(microtime(true));
