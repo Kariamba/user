@@ -63,6 +63,22 @@
 			catch(\PDOException $e) {  
 				die($e->getMessage());
 			}
+			
+			$session_check = false
+			if(version_compare(phpversion(), '5.4.0', '>=') && ) {
+				if(session_status() === PHP_SESSION_ACTIVE) {
+					$session_check = true;
+				}
+			}
+			else {
+				if(!empty(session_id())) {
+					$session_check = true;
+				}
+			}
+			if(!$session_check) {
+				die('Session is not started. Session are required for OZ\User class.');
+			}
+
 			if(!empty(self::$_definition['table']) && !empty(self::$_definition['id']) && !empty(self::$_definition['login']) && !empty(self::$_definition['pass'])) {
 				self::$_init = true;
 			}
